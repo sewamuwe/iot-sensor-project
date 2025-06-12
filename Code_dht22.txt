@@ -1,0 +1,74 @@
+// dht 22 code
+/*
+ * DHT22 Temperature and Humidity Sensor with Arduino Uno
+ * This sketch reads temperature and humidity data from a DHT22 sensor
+ * and displays the readings on the Serial Monitor.
+ */
+
+#include <DHT.h>
+
+// Define the sensor pin and type
+#define DHTPIN 8      // DHT22 data pin connected to digital pin 2
+#define DHTTYPE DHT22 // Sensor type (DHT22 also known as AM2302)
+
+// Initialize the DHT sensor
+DHT dht(DHTPIN, DHTTYPE);
+
+void setup() {
+  // Initialize serial communication at 9600 baud rate
+  Serial.begin(9600);
+  
+  // Print a message to indicate the program has started
+  Serial.println("DHT22 Temperature and Humidity Sensor Test");
+  
+  // Initialize the DHT sensor
+  dht.begin();
+  
+  // Wait a few seconds to stabilize the sensor
+  delay(2000);
+}
+
+void loop() {
+  // Wait between measurements (DHT22 is slow)
+  delay(2000);
+  
+  // Read humidity
+  float humidity = dht.readHumidity();
+  
+  // Read temperature in Celsius
+  float temperatureC = dht.readTemperature();
+  
+  // Read temperature in Fahrenheit
+  float temperatureF = dht.readTemperature(true);
+  
+  // Check if any reads failed and exit early (to try again)
+  if (isnan(humidity) || isnan(temperatureC) || isnan(temperatureF)) {
+    Serial.println("Failed to read from DHT sensor!");
+    return;
+  }
+  
+  // Compute heat index in Fahrenheit (default)
+  float heatIndexF = dht.computeHeatIndex(temperatureF, humidity);
+  
+  // Compute heat index in Celsius
+  float heatIndexC = dht.computeHeatIndex(temperatureC, humidity, false);
+  
+  // Print the readings
+  Serial.print("Humidity: ");
+  Serial.print(humidity);
+  Serial.println("%");
+  
+  Serial.print("Temperature: ");
+  Serial.print(temperatureC);
+  Serial.print("°C / ");
+  Serial.print(temperatureF);
+  Serial.println("°F");
+  
+  Serial.print("Heat Index: ");
+  Serial.print(heatIndexC);
+  Serial.print("°C / ");
+  Serial.print(heatIndexF);
+  Serial.println("°F");
+  
+  Serial.println("------------------------------");
+}
